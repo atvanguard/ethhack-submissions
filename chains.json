@@ -1,1 +1,14 @@
-{}
+{
+  "0x8dafb1ba016e7d2a13f48c8ee0ee395fd53263a842b0cb4837e018e1435ba775": {
+    "contracts": {
+      "0xdb00e0b2ecda8e6ec8eab3f8ab11b1f5b69a8d50ebebfd24d1f060531bffd512": {
+        "name": "HackSubmissions",
+        "address": "0xe5731c3df7a510fba6c5b2766251ce631C6B1d78"
+      },
+      "0x5862eed8acd56a606ef8762ba148f7fb1789611bca305197fab9f3c7af0e8fb6": {
+        "name": "HackSubmissions",
+        "address": "0x6427A6200Bed37FC1e512BdeA49D25Aa9089CF47"
+      }
+    }
+  }
+}
