@@ -9,5 +9,10 @@
   "license": "ISC",
   "homepage": "",
   "devDependencies": {
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2"
+  },
+  "dependencies": {
+    "embark-solc": "^0.2.2"
   }
 }

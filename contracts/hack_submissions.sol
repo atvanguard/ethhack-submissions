@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 contract HackSubmissions {
-  uint256 hackathonCounter;
+  uint256 public hackathonCounter;
 
   struct Team {
     // ETH address of the team that also acts as the unique id
@@ -32,6 +32,7 @@ contract HackSubmissions {
     // Submission[] submissions; 
   }
 
+  // id to hackathon struct
   mapping(bytes32 => Hackathon) hackathons;
 
   // constructor(uint initialValue) public {
@@ -91,4 +92,17 @@ contract HackSubmissions {
     hackathons[hackId].isOver = true;
     // @todo transfer back remaining prize amount to owner?  
   }
+
+  function getHackathon(uint256 id) public view returns(string name) {
+    name = hackathons[bytes32(id)].name;
+  }
+
+  // function getHackathons() public view returns(bytes32[]) {
+  //   bytes32[hackathonCounter] memory hacks;
+  //   // for(uint256 i = 0; i < hackathonCounter; i++) {
+  //   //   // hacks[i] = bytes32(hackathons[bytes32(i)].name);
+  //   //   hacks[i] = hackathons[bytes32(i)].name;
+  //   // }
+  //   return hacks;
+  // }
 }
