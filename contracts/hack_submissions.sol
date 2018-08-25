@@ -27,8 +27,8 @@ contract HackSubmissions {
     uint256 prizes;
     bool isOver;
     // whitelisted teams
+    address[] teamLeads;
     mapping(address => Team) teams;
-    // Team[] teams;
     // Submission[] submissions; 
   }
 
@@ -61,7 +61,14 @@ contract HackSubmissions {
       */
   function createHackathon(string name) public payable returns (bytes32) {
     bytes32 id = bytes32(hackathonCounter++);
-    Hackathon memory hackathon = Hackathon(id, msg.sender, name, msg.value, false);
+    Hackathon memory hackathon = Hackathon(
+      id,
+      msg.sender, // organizer
+      name,
+      msg.value, // Collective bag of hackathon prizes
+      false, // isOver
+      new address[](0) // registered teams
+    );
     // @todo emit event?
     hackathons[id] = hackathon;
     return id;
@@ -72,7 +79,8 @@ contract HackSubmissions {
       validHackathon(hackId) {
     address id = msg.sender;
     require(hackathons[hackId].teams[id].id == address(0));
-    Team memory team = Team(id, hackId, name, '0');
+    Team memory team = Team(id, hackId, name, "");
+    hackathons[hackId].teamLeads.push(id);
     hackathons[hackId].teams[id] = team;
   }
 
@@ -93,8 +101,16 @@ contract HackSubmissions {
     // @todo transfer back remaining prize amount to owner?  
   }
 
-  function getHackathon(uint256 id) public view returns(string name) {
-    name = hackathons[bytes32(id)].name;
+  function getHackathon(uint256 id)
+      public view
+      validHackathon(bytes32(id))
+      returns(address organizer, string name, uint256 prizes, bool isOver, uint256 numTeams) {
+    Hackathon storage hackathon = hackathons[bytes32(id)];
+    organizer = hackathon.organizer;
+    name = hackathon.name;
+    prizes = hackathon.prizes;
+    isOver = hackathon.isOver;
+    numTeams = hackathon.teamLeads.length;
   }
 
   // function getHackathons() public view returns(bytes32[]) {

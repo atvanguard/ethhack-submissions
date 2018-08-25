@@ -10,7 +10,8 @@
   "homepage": "",
   "devDependencies": {
     "react": "^16.4.2",
-    "react-dom": "^16.4.2"
+    "react-dom": "^16.4.2",
+    "react-router-component": "^0.39.1"
   },
   "dependencies": {
     "embark-solc": "^0.2.2"
