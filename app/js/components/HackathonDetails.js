@@ -6,6 +6,8 @@ var Location = Router.Location
 
 import EmbarkJS from 'Embark/EmbarkJS';
 import HackSubmissions from 'Embark/contracts/HackSubmissions';
+import RegisterTeamForm from './RegisterTeamForm';
+import TeamsList from './TeamsList';
 
 export default class HackathonDetails extends React.Component {
   constructor() {
@@ -32,7 +34,12 @@ export default class HackathonDetails extends React.Component {
         <h1>{this.state.name}</h1>
 
         <button type="button" class="btn btn-primary">
-        isOver <span class="badge badge-light">{this.state.isOver == true ? 'Yes' : 'No'}</span>
+        startsAt <span class="badge badge-light">{this.state.startsAt}</span>
+          {/* <span class="sr-only">unread messages</span> */}
+        </button>
+
+        <button type="button" class="btn btn-primary">
+        duration <span class="badge badge-light">{this.state.duration}</span>
           {/* <span class="sr-only">unread messages</span> */}
         </button>
 
@@ -46,6 +53,9 @@ export default class HackathonDetails extends React.Component {
           Teams <span class="badge badge-light">{this.state.numTeams}</span>
           {/* <span class="sr-only">unread messages</span> */}
         </button>
+
+        <RegisterTeamForm hack_id={this.props.id} />
+        <TeamsList hack_id={this.props.id} />
       </div>
     )
   }

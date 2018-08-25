@@ -1,9 +1,8 @@
 import React from 'react'
 
-import EmbarkJS from 'Embark/EmbarkJS';
 import web3Util from '../Web3Util';
 
-export default class CreateHackathonForm extends React.Component {
+export default class RegisterTeamForm extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -20,24 +19,22 @@ export default class CreateHackathonForm extends React.Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    this.createHackathon(this.state.value);
-    // refresh the parent after the tx has confirmed to list the new hackathon
-    // alternatively, populate from the event
+    this.registerTeam(this.props.hack_id, this.state.value);
   }
 
-  async createHackathon(name) {
-    web3Util.createHackathon(name);
+  async registerTeam(hackId, name) {
+    await web3Util.registerTeam(hackId, name);
   }
 
   render() {
     return (
       <form onSubmit={this.handleSubmit}>
         <div class="form-group">
-          <label for="hackathon_name">Create New Hackathon</label>
-          <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter hackathon name"
+          <label>Register Team</label>
+          <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter team name"
                   value={this.state.value} onChange={this.handleChange} />
         </div>
-        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="submit" class="btn btn-primary">Register</button>
       </form>
     )
   }
