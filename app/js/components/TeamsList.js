@@ -1,12 +1,23 @@
 import React from 'react'
-import EmbarkJS from 'Embark/EmbarkJS';
-import HackSubmissions from 'Embark/contracts/HackSubmissions';
 const Bluebird = require("bluebird");
+
+import EmbarkJS from 'Embark/EmbarkJS';
+const Link = require('react-router-component').Link
+
+import HackSubmissions from 'Embark/contracts/HackSubmissions';
 
 class TeamRow extends React.Component {
   render() {
-    // return <Link href={"/hackathons/" + this.props.id}>{this.props.name}</Link>
-    return <li class="list-group-item">{this.props.name + ' ' + (this.props.content || '')}</li>
+    console.log('TeamRow props', this.props)
+    const href = `/hackathons/${this.props.hack_id}/${this.props.team_id}`
+    return (
+      <div class="list-group-item list-group-item-action">
+        <label>{this.props.name}</label>
+        {this.props.content &&
+          <Link href={href} style={{color: 'green', float: 'right'}}>View Submission</Link>
+        }
+      </div>
+    )
   }
 }
 
@@ -34,7 +45,10 @@ export default class TeamsList extends React.Component {
       return HackSubmissions.methods.getTeam(this.props.hack_id, id).call()
         .then(res => {
           // console.log(res);
-          teams.push({name: res.name, content: web3.utils.hexToAscii(res.content)});
+          const t = {name: res.name, team_id: id};
+          if (res.content) t.content = web3.utils.hexToAscii(res.content);
+          console.log('t', t)
+          teams.push(t);
         });
     })
     this.setState({teams});
@@ -43,10 +57,10 @@ export default class TeamsList extends React.Component {
   render() {
     let rows = [];
     (this.state.teams || []).forEach((team,i) => {
-      rows.push(<TeamRow name={team.name} content={team.content} key={i} />)
+      rows.push(<TeamRow {...team} hack_id={this.props.hack_id} key={i} />)
     });
     return (
-      <ul class="list-group">{rows}</ul>
+      <div class="list-group">{rows}</div>
     )
   }
 }

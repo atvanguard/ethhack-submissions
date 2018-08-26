@@ -59,7 +59,7 @@ export default class HackathonDetails extends React.Component {
         <h1>{this.state.name}</h1>
         <h3>{this.state.description}</h3>
 
-        <p>{this.state.content}</p>
+        {/* <p>{this.state.content}</p> */}
 
         <button type="button" class="btn btn-primary">
         startsAt <span class="badge badge-light">{this.state.startsAt}</span>

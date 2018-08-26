@@ -1,11 +1,15 @@
 import React from 'react'
 import EmbarkJS from 'Embark/EmbarkJS';
-var Link = require('react-router-component').Link
+const Link = require('react-router-component').Link
 import HackSubmissions from 'Embark/contracts/HackSubmissions';
 
 class HackathonRow extends React.Component {
   render() {
-    return <Link href={"/hackathons/" + this.props.id}>{this.props.name}</Link>
+    return (
+      <div class="list-group-item list-group-item-action">
+        <Link href={"/hackathons/" + this.props.id}>{this.props.name}</Link>
+      </div>
+    )
   }
 }
 
