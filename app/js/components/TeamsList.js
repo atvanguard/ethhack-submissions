@@ -6,7 +6,7 @@ const Bluebird = require("bluebird");
 class TeamRow extends React.Component {
   render() {
     // return <Link href={"/hackathons/" + this.props.id}>{this.props.name}</Link>
-    return <li class="list-group-item">{this.props.name}</li>
+    return <li class="list-group-item">{this.props.name + ' ' + (this.props.content || '')}</li>
   }
 }
 
@@ -32,7 +32,10 @@ export default class TeamsList extends React.Component {
     const teams = [];
     await Bluebird.map(_teams, id => {
       return HackSubmissions.methods.getTeam(this.props.hack_id, id).call()
-        .then(name => teams.push({name}))
+        .then(res => {
+          // console.log(res);
+          teams.push({name: res.name, content: web3.utils.hexToAscii(res.content)});
+        });
     })
     this.setState({teams});
   }
@@ -40,7 +43,7 @@ export default class TeamsList extends React.Component {
   render() {
     let rows = [];
     (this.state.teams || []).forEach((team,i) => {
-      rows.push(<TeamRow name={team.name} key={i} />)
+      rows.push(<TeamRow name={team.name} content={team.content} key={i} />)
     });
     return (
       <ul class="list-group">{rows}</ul>

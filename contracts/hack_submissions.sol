@@ -24,6 +24,7 @@ contract HackSubmissions {
     bytes32 id;
     address organizer;
     string name;
+    string details;
     uint256 prizes;
     uint256 startsAt;
     uint256 duration; // seconds
@@ -50,7 +51,7 @@ contract HackSubmissions {
     _;
   }
 
-  modifier verifyTeam(address teamId, bytes32 hackId) {
+  modifier verifyTeam(bytes32 hackId, address teamId) {
     require(hackathons[hackId].teams[teamId].id != address(0));
     _;
   }
@@ -60,12 +61,13 @@ contract HackSubmissions {
       * msg.value Collective bag of hackathon prizes
       * @return id The Hackathon id
       */
-  function createHackathon(string name) public payable returns (bytes32) {
+  function createHackathon(string name, string details) public payable returns (bytes32) {
     bytes32 id = bytes32(hackathonCounter++);
     Hackathon memory hackathon = Hackathon(
       id,
       msg.sender, // organizer
       name,
+      details, // Hash of the hackathon data, e.g. questionnaire
       msg.value, // Collective bag of hackathon prizes
       now, // startsAt
       36000, // duration
@@ -87,10 +89,10 @@ contract HackSubmissions {
     hackathons[hackId].teams[id] = team;
   }
 
-  function createSubmission(bytes32 hackId, string content)
+  function createSubmission(uint256 _hackId, string content)
       public
-      verifyTeam(msg.sender, hackId) {
-    hackathons[hackId].teams[msg.sender].content = content;
+      verifyTeam(bytes32(_hackId), msg.sender) {
+    hackathons[bytes32(_hackId)].teams[msg.sender].content = content;
   }
 
   // function getTeam(bytes32 hackId, address id) public view {
@@ -107,11 +109,13 @@ contract HackSubmissions {
   function getHackathon(uint256 _id)
       public view
       validHackathon(bytes32(_id))
-      returns(address organizer, string name, uint256 prizes, uint256 startsAt, uint256 duration, uint256 numTeams) {
+      returns(address organizer, string name, string details,
+          uint256 prizes, uint256 startsAt, uint256 duration, uint256 numTeams) {
     bytes32 id = bytes32(_id);
     Hackathon storage hackathon = hackathons[id];
     organizer = hackathon.organizer;
     name = hackathon.name;
+    details = hackathon.details;
     prizes = hackathon.prizes;
     startsAt = hackathon.startsAt;
     duration = hackathon.duration;
@@ -128,11 +132,12 @@ contract HackSubmissions {
   function getTeam(uint256 _hackId, address teamId)
       public view
       validHackathon(bytes32(_hackId))
-      returns (string name) {
+      returns (string name, string content) {
     bytes32 hackId = bytes32(_hackId);
     require(hackathons[hackId].teams[teamId].id != address(0));
     // Team storage team = hackathons[hackId].teams[teamId].name;
     name = hackathons[hackId].teams[teamId].name;
+    content = hackathons[hackId].teams[teamId].content;
   } 
 
   function isHackathonOver(bytes32 id) internal view returns(bool isOver) {

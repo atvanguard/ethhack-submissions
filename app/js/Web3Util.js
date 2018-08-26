@@ -6,11 +6,11 @@ class Web3Util {
     return accounts[0];  
   }
 
-  async createHackathon(name) {
+  async createHackathon(name, details) {
     const from = await this.getAccount();
-    const estimateGas = await HackSubmissions.methods.createHackathon(name).estimateGas({from});
+    const estimateGas = await HackSubmissions.methods.createHackathon(name, details).estimateGas({from});
     console.log('createHackathon - estimateGas', estimateGas);
-    const createHackathonTx = await HackSubmissions.methods.createHackathon(name).send({
+    const createHackathonTx = await HackSubmissions.methods.createHackathon(name, details).send({
       from,
       gas: estimateGas + 500
     });
@@ -26,6 +26,24 @@ class Web3Util {
       gas: estimateGas + 500
     });
     console.log('registerTeamTx', registerTeamTx);
+  }
+
+  async createSubmission(hackId, _content) {
+    const content = web3.utils.asciiToHex(_content);
+    // const hackId = web3.utils.asciiToHex(_hackId);
+    console.log(_content, content, hackId, hackId)
+    const from = await this.getAccount();
+    const estimateGas = await HackSubmissions.methods.createSubmission(hackId, content).estimateGas({from});
+    console.log('createSubmission - estimateGas', estimateGas);
+    const createSubmissionTx = await HackSubmissions.methods.createSubmission(hackId, content).send({
+      from,
+      gas: estimateGas + 500
+    });
+    console.log('createSubmissionTx', createSubmissionTx);
+  }
+
+  toBytes32(c) {
+    return Buffer.from(c.toString(), 'utf8');
   }
 }
 
