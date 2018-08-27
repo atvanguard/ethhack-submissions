@@ -3,6 +3,7 @@ const Bluebird = require("bluebird");
 
 import EmbarkJS from 'Embark/EmbarkJS';
 const Link = require('react-router-component').Link
+import web3Util from '../Web3Util';
 
 import HackSubmissions from 'Embark/contracts/HackSubmissions';
 
@@ -41,15 +42,13 @@ export default class TeamsList extends React.Component {
     console.log('teams', _teams);
     _teams = _teams || [];
     const teams = [];
-    await Bluebird.map(_teams, id => {
-      return HackSubmissions.methods.getTeam(this.props.hack_id, id).call()
-        .then(res => {
-          // console.log(res);
-          const t = {name: res.name, team_id: id};
-          if (res.content) t.content = web3.utils.hexToAscii(res.content);
-          console.log('t', t)
-          teams.push(t);
-        });
+    await Bluebird.map(_teams, async (id) => {
+      const res = await web3Util.getTeam(this.props.hack_id, id)
+      // console.log(res);
+      const t = {name: res.name, team_id: id};
+      if (res.content) t.content = web3.utils.hexToAscii(res.content);
+      console.log('t', t)
+      teams.push(t);
     })
     this.setState({teams});
   }

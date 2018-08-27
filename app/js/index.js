@@ -6,7 +6,7 @@ const Location = Router.Location
 
 import HomePage from './components/HomePage';
 import HackathonDetails from './components/HackathonDetails';
-// import HackathonDetails from './components/HackathonDetails';
+import ViewSubmission from './components/ViewSubmission';
 
 import EmbarkJS from 'Embark/EmbarkJS';
 
@@ -27,7 +27,7 @@ class Hacks extends React.Component {
       <Locations>
         <Location path="/" handler={HomePage} />
         <Location path="/hackathons/:id" handler={HackathonDetails} />
-        {/* <Location path="/hackathons/:id/:teamId" handler={HackathonDetails} /> */}
+        <Location path="/hackathons/:id/:teamId" handler={ViewSubmission} />
       </Locations>
     )
   }

@@ -45,6 +45,13 @@ class Web3Util {
   toBytes32(c) {
     return Buffer.from(c.toString(), 'utf8');
   }
+
+  // read function
+  async getTeam(hackId, teamId) {
+    console.log('hackId, teamId', hackId, teamId)
+    const team = await HackSubmissions.methods.getTeam(hackId, teamId).call();
+    return team;
+  }
 }
 
 export default new Web3Util();
