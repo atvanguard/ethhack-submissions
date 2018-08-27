@@ -32,21 +32,23 @@ export default class ViewSubmission extends React.Component {
     const content = JSON.parse(this.state.content || '{}');
     Object.keys(content).forEach((q,i) => {
       rows.push(
-        <div key={i}>
-          <dt>{q}</dt>
-          <dd>{content[q]}</dd>
+        <div class="card-text" key={i}>
+          <h4>{q}</h4>
+          <p>{content[q]}</p>
         </div>
       );
     });
 
     return (
-      <div>
+      <div class="card">
         {
           this.state.backendError !== '' &&
           <Alert bsStyle="danger">{this.state.backendError}</Alert>
         }
-        <h1>{this.state.name}</h1>
-        <dl>{rows}</dl>
+        <h1 class="card-title">{this.state.name}</h1>
+        <div class="card-body">
+          {rows}
+        </div>
       </div>
     )
   }

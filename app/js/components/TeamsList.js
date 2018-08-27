@@ -25,9 +25,7 @@ class TeamRow extends React.Component {
 export default class TeamsList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      hacks: [{name: 'Team 1'}, {name: 'Team 2'}]
-    }
+    this.state = {}
   }
 
   componentDidMount() { 
@@ -59,7 +57,12 @@ export default class TeamsList extends React.Component {
       rows.push(<TeamRow {...team} hack_id={this.props.hack_id} key={i} />)
     });
     return (
-      <div class="list-group">{rows}</div>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Registered teams</h5>
+          <div class="list-group">{rows}</div>
+        </div>
+      </div>
     )
   }
 }

@@ -1,24 +1,21 @@
 import React from 'react'
-
-var Router = require('react-router-component')
-var Locations = Router.Locations
-var Location = Router.Location
+import { Alert } from 'react-bootstrap';
+const Link = require('react-router-component').Link
 
 import EmbarkJS from 'Embark/EmbarkJS';
 import HackSubmissions from 'Embark/contracts/HackSubmissions';
-import RegisterTeamForm from './RegisterTeamForm';
-import TeamsList from './TeamsList';
-import SubmissionPage from './SubmissionPage';
+import ipfsUtil from '../IpfsUtil';
 
 export default class HackathonDetails extends React.Component {
-  constructor() {
-    super();
-    this.state = {}
+  constructor(props) {
+    super(props);
+    this.state = {
+      backendError: ''
+    }
   }
 
   componentDidMount() { 
     EmbarkJS.onReady(async () => {
-      console.log('in HackathonDetails');
       this.getHackathonDetails(this.props.id);
     })
   }
@@ -27,23 +24,17 @@ export default class HackathonDetails extends React.Component {
     let hack;
     try {
       hack = await HackSubmissions.methods.getHackathon(id).call();
-      console.log(hack);
+      if (hack.details) {
+        hack.content = await ipfsUtil.decodeIpfsHash(hack.details, true /* jsonParse */);
+        hack.description = hack.content.description || '';
+      }
     } catch(e) {
-      console.log('HackSubmissions.methods.getHackathon(id).call()', e)
+      return this.setState({backendError: e.message || e});
     }
 
-    if (hack.details) {
-      try {
-        hack.content = await EmbarkJS.Storage.get(hack.details);
-        const content = JSON.parse(hack.content);
-        hack.description = content.description;
-        hack.questionnaire = content.submission_questionnaire;
-        console.log('hack.content', hack.content);
-      } catch(e) {
-        console.log('error in loading from IPFS', e)
-      }
-    }
-    if(hack) this.setState(hack);
+    let {name, prizes, startsAt, endsAt, description, numTeams} = hack;
+    prizes = web3.utils.fromWei(prizes);
+    this.setState({name, description, startsAt, endsAt, prizes, numTeams, backendError: ''});
   }
 
   onSubmitProjectCLick(e) {
@@ -51,40 +42,49 @@ export default class HackathonDetails extends React.Component {
   }
 
   render() {
-    if (this.state.showSubmissiongPage) {
-      return <SubmissionPage hackId={this.props.id} questionnaire={this.state.questionnaire} />
-    }
     return (
-      <div>
-        <h1>{this.state.name}</h1>
-        <h3>{this.state.description}</h3>
+      <div class="card" style={{"margin-bottom": "50px"}}>
+      <div class="card-body">
+        <h5 class="card-title">{this.state.name}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{this.state.description}</h6>
+        {
+          this.state.backendError !== '' &&
+          <Alert bsStyle="danger">{this.state.backendError}</Alert>
+        }
+        <form>
+          <div class="form-group row">
+            <label for="startsAt" class="col-sm-2 col-form-label">Starts at:</label>
+            <div class="col-sm-10">
+              <input type="text" readonly class="form-control-plaintext" id="startsAt" value={this.state.startsAt} />
+            </div>
+          </div>
 
-        {/* <p>{this.state.content}</p> */}
+          <div class="form-group row">
+            <label for="endsAt" class="col-sm-2 col-form-label">Ends at:</label>
+            <div class="col-sm-10">
+              <input type="text" readonly class="form-control-plaintext" id="endsAt" value={this.state.endsAt} />
+            </div>
+          </div>
 
-        <button type="button" class="btn btn-primary">
-        startsAt <span class="badge badge-light">{this.state.startsAt}</span>
-          {/* <span class="sr-only">unread messages</span> */}
-        </button>
+          <div class="form-group row">
+            <label for="prizes" class="col-sm-2 col-form-label">Prizes:</label>
+            <div class="col-sm-10">
+              <input type="text" readonly class="form-control-plaintext" id="prizes" value={this.state.prizes + ' ETH'} />
+            </div>
+          </div>
 
-        <button type="button" class="btn btn-primary">
-        duration <span class="badge badge-light">{this.state.duration}</span>
-          {/* <span class="sr-only">unread messages</span> */}
-        </button>
+          <div class="form-group row">
+            <label for="numTeams" class="col-sm-2 col-form-label"># Teams:</label>
+            <div class="col-sm-10">
+              <input type="text" readonly class="form-control-plaintext" id="numTeams" value={this.state.numTeams} />
+            </div>
+          </div>
 
-        <button type="button" class="btn btn-primary">
-        prizes bag <span class="badge badge-light">{this.state.prizes}</span>
-          {/* <span class="sr-only">unread messages</span> */}
-        </button>
-
-        {/* <span class="badge badge-success">{this.state.prizes}</span> */}
-        <button type="button" class="btn btn-primary">
-          Teams <span class="badge badge-light">{this.state.numTeams}</span>
-          {/* <span class="sr-only">unread messages</span> */}
-        </button>
-
-        <RegisterTeamForm hack_id={this.props.id} />
-        <TeamsList hack_id={this.props.id} />
-        <button type="submit" class="btn btn-success" onClick={(e) => this.onSubmitProjectCLick(e)}>Submit your project</button>
+          <Link href={"/hackathons/" + this.props.id + "/submit"}>
+            <button class="btn btn-success">Submit project</button>
+          </Link>
+        </form>
+      </div>
       </div>
     )
   }

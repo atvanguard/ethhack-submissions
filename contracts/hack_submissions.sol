@@ -27,7 +27,8 @@ contract HackSubmissions {
     string details;
     uint256 prizes;
     uint256 startsAt;
-    uint256 duration; // seconds
+    uint256 endsAt;
+    // uint256 duration; // seconds
     // whitelisted teams
     address[] teamLeads;
     mapping(address => Team) teams;
@@ -61,7 +62,12 @@ contract HackSubmissions {
       * msg.value Collective bag of hackathon prizes
       * @return id The Hackathon id
       */
-  function createHackathon(string name, string details) public payable returns (bytes32) {
+  function createHackathon(
+      string name,
+      string details,
+      uint256 startsAt,
+      uint256 endsAt)
+      public payable returns (bytes32) {
     bytes32 id = bytes32(hackathonCounter++);
     Hackathon memory hackathon = Hackathon(
       id,
@@ -69,8 +75,8 @@ contract HackSubmissions {
       name,
       details, // Hash of the hackathon data, e.g. questionnaire
       msg.value, // Collective bag of hackathon prizes
-      now, // startsAt
-      36000, // duration
+      startsAt,
+      endsAt,
       new address[](0) // registered teams
     );
     // @todo emit event?
@@ -110,7 +116,7 @@ contract HackSubmissions {
       public view
       validHackathon(bytes32(_id))
       returns(address organizer, string name, string details,
-          uint256 prizes, uint256 startsAt, uint256 duration, uint256 numTeams) {
+          uint256 prizes, uint256 startsAt, uint256 endsAt, uint256 numTeams) {
     bytes32 id = bytes32(_id);
     Hackathon storage hackathon = hackathons[id];
     organizer = hackathon.organizer;
@@ -118,7 +124,7 @@ contract HackSubmissions {
     details = hackathon.details;
     prizes = hackathon.prizes;
     startsAt = hackathon.startsAt;
-    duration = hackathon.duration;
+    endsAt = hackathon.endsAt;
     numTeams = hackathon.teamLeads.length;
   }
 
@@ -140,10 +146,10 @@ contract HackSubmissions {
     content = hackathons[hackId].teams[teamId].content;
   } 
 
-  function isHackathonOver(bytes32 id) internal view returns(bool isOver) {
-    Hackathon storage hack = hackathons[id];
-    isOver = (hack.startsAt + hack.duration >= now ? true : false);
-  }
+  // function isHackathonOver(bytes32 id) internal view returns(bool isOver) {
+  //   Hackathon storage hack = hackathons[id];
+  //   isOver = (hack.startsAt + hack.duration >= now ? true : false);
+  // }
 
   // function getHackathons() public view returns(bytes32[]) {
   //   bytes32[hackathonCounter] memory hacks;

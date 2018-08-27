@@ -1,15 +1,38 @@
 import React from 'react'
 import EmbarkJS from 'Embark/EmbarkJS';
 import web3Util from '../Web3Util';
+import ipfsUtil from '../ipfsUtil';
 import { Alert } from 'react-bootstrap';
+import HackSubmissions from 'Embark/contracts/HackSubmissions';
 
 export default class SubmissionPage extends React.Component {
   constructor(props) {
     super(props);
+    console.log(this.props)
     this.state = {backendError: ''}
     this.questions = {}
     this.handleSubmit = this.handleSubmit.bind(this);
     this.generateContentHash = this.generateContentHash.bind(this);
+  }
+
+  componentDidMount() { 
+    EmbarkJS.onReady(async () => {
+      this.getHackathonDetails(this.props.id);
+    })
+  }
+
+  async getHackathonDetails(id) {
+    try {
+      const hack = await HackSubmissions.methods.getHackathon(id).call();
+      if (hack.details) {
+        const content = await ipfsUtil.decodeIpfsHash(hack.details, true /* jsonParse */);
+        const questionnaire = content.submission_questionnaire;
+        console.log(content, questionnaire)
+        this.setState({questionnaire, backendError: ''})
+      }
+    } catch(e) {
+      this.setState({backendError: e.message || e});
+    }
   }
 
   handleChange(event, id) {
@@ -22,7 +45,7 @@ export default class SubmissionPage extends React.Component {
 
   buildSubmissionString() {
     let sub = {};
-    Object.keys(this.props.questionnaire || {}).forEach(q => {
+    Object.keys(this.state.questionnaire || {}).forEach(q => {
       const id = this.canonicalizeQuestion(q);
       // console.log(q, id);
       sub[q] = this.state[id];
@@ -36,7 +59,7 @@ export default class SubmissionPage extends React.Component {
     try {
       await web3Util.createSubmission(this.props.hackId, this.state.uploadHash);
     } catch (e) {
-      this.setState({backendError: e.message});
+      this.setState({backendError: e.message || e});
     }
   }
 
@@ -49,16 +72,9 @@ export default class SubmissionPage extends React.Component {
     this.setState({uploadHash: hash})
   }
 
-  // componentDidMount() { 
-  //   EmbarkJS.onReady(async () => {
-  //     console.log('in HackathonDetails');
-  //     this.getHackathonDetails(this.props.id);
-  //   })
-  // }
-
   render() {
     const rows = [];
-    Object.keys(this.props.questionnaire || {}).forEach((q,i) => {
+    Object.keys(this.state.questionnaire || {}).forEach((q,i) => {
       const id = this.canonicalizeQuestion(q);
       rows.push(
         <div class="form-group" key={id}>
@@ -73,9 +89,8 @@ export default class SubmissionPage extends React.Component {
       <form onSubmit={this.handleSubmit}>
         {rows}
         {
-          this.state.backendError !== '' ?
+          this.state.backendError !== '' &&
           <Alert bsStyle="danger">{this.state.backendError}</Alert>
-          : ''
         }
         <button class="btn btn-primary" onClick={this.generateContentHash}>Generate upload hash</button>
         {this.state.uploadHash &&

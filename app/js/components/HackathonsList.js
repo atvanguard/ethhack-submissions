@@ -16,9 +16,7 @@ class HackathonRow extends React.Component {
 export default class HackathonsList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      hacks: [{name: 'Dummy Hackathon 1'}, {name: 'Dummy Hackathon 2'}]
-    }
+    this.state = {}
   }
 
   componentDidMount() { 
@@ -49,8 +47,14 @@ export default class HackathonsList extends React.Component {
     (this.state.hacks || []).forEach((hack,i) => {
       rows.push(<HackathonRow name={hack.name} id={hack.id} key={i} />)
     });
+    if (!rows.length) return null;
     return (
-      <div class="list-group">{rows}</div>
+      <div class="card" id="HackathonsListCard">
+        <div class="card-body">
+          <h5 class="card-title">Hackathons in progress</h5>
+          <div class="list-group">{rows}</div>
+        </div>
+      </div>
     )
   }
 }

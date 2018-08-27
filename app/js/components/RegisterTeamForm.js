@@ -19,23 +19,23 @@ export default class RegisterTeamForm extends React.Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    this.registerTeam(this.props.hack_id, this.state.value);
-  }
-
-  async registerTeam(hackId, name) {
-    await web3Util.registerTeam(hackId, name);
+    web3Util.registerTeam(this.props.hack_id, this.state.value);
   }
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <div class="form-group">
-          <label>Register Team</label>
-          <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Enter team name"
-                  value={this.state.value} onChange={this.handleChange} />
-        </div>
-        <button type="submit" class="btn btn-primary">Register</button>
-      </form>
+      <div class="card" style={{"margin-bottom": "50px"}}>
+      <div class="card-body">
+        <h5 class="card-title">Register new team</h5>
+        <form onSubmit={this.handleSubmit}>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Enter team name"
+              value={this.state.value} onChange={this.handleChange} />
+          </div>
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+      </div>
+      </div>
     )
   }
 }

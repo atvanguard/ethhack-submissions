@@ -6,14 +6,13 @@ class Web3Util {
     return accounts[0];  
   }
 
-  async createHackathon(name, details) {
+  async createHackathon(name, details, prizes, startsAt, endsAt) {
     const from = await this.getAccount();
-    const estimateGas = await HackSubmissions.methods.createHackathon(name, details).estimateGas({from});
+    const params = {from, value: web3.utils.toWei(prizes)};
+    const estimateGas = await HackSubmissions.methods.createHackathon(name, details, startsAt, endsAt).estimateGas(params);
     console.log('createHackathon - estimateGas', estimateGas);
-    const createHackathonTx = await HackSubmissions.methods.createHackathon(name, details).send({
-      from,
-      gas: estimateGas + 500
-    });
+    params.gas = estimateGas + 500;
+    const createHackathonTx = await HackSubmissions.methods.createHackathon(name, details, startsAt, endsAt).send(params);
     console.log('createHackathonTx', createHackathonTx);
   }
 
