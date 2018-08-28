@@ -24,7 +24,8 @@ export default class RegisterTeamForm extends React.Component {
 
   render() {
     return (
-      <div class="card" style={{"margin-bottom": "50px"}}>
+      // style={{"margin-bottom": "50px"}}
+      <div class="card">
       <div class="card-body">
         <h5 class="card-title">Register new team</h5>
         <form onSubmit={this.handleSubmit}>

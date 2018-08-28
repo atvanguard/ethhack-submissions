@@ -140,7 +140,7 @@ contract HackSubmissions {
       validHackathon(bytes32(_hackId))
       returns (string name, string content) {
     bytes32 hackId = bytes32(_hackId);
-    require(hackathons[hackId].teams[teamId].id != address(0));
+    require(hackathons[hackId].teams[teamId].id != address(0), 'Team not registered');
     // Team storage team = hackathons[hackId].teams[teamId].name;
     name = hackathons[hackId].teams[teamId].name;
     content = hackathons[hackId].teams[teamId].content;

@@ -30,7 +30,7 @@ class Web3Util {
   async createSubmission(hackId, _content) {
     const content = web3.utils.asciiToHex(_content);
     // const hackId = web3.utils.asciiToHex(_hackId);
-    console.log(_content, content, hackId, hackId)
+    console.log(_content, content, hackId)
     const from = await this.getAccount();
     const estimateGas = await HackSubmissions.methods.createSubmission(hackId, content).estimateGas({from});
     console.log('createSubmission - estimateGas', estimateGas);
@@ -47,6 +47,10 @@ class Web3Util {
 
   // read function
   async getTeam(hackId, teamId) {
+    if (!teamId) {
+      // teamId is the current metamask account
+      teamId = await this.getAccount(); 
+    }
     console.log('hackId, teamId', hackId, teamId)
     const team = await HackSubmissions.methods.getTeam(hackId, teamId).call();
     return team;

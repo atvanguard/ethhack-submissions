@@ -17,8 +17,24 @@ export default class SubmissionPage extends React.Component {
 
   componentDidMount() { 
     EmbarkJS.onReady(async () => {
-      this.getHackathonDetails(this.props.id);
+      this.checkTeamIsRegistered(this.props.id);
     })
+  }
+
+  async checkTeamIsRegistered() {
+    try {
+      const team = await web3Util.getTeam(this.props.id);
+      if (team.content) {
+        return this.setState({alreadySubmitted: true, teamName: team.name, backendError: ''});
+      }
+      this.setState({teamName: team.name, backendError: ''});
+      this.getHackathonDetails(this.props.id);
+    } catch(e) {
+      // team not registered
+      let msg = e.message || e;
+      msg += '\nThe most probable cause is that you haven\'t registered a team with this metamask account.';
+      this.setState({backendError: msg});
+    }
   }
 
   async getHackathonDetails(id) {
@@ -27,7 +43,7 @@ export default class SubmissionPage extends React.Component {
       if (hack.details) {
         const content = await ipfsUtil.decodeIpfsHash(hack.details, true /* jsonParse */);
         const questionnaire = content.submission_questionnaire;
-        console.log(content, questionnaire)
+        console.log('content, questionnaire', content, questionnaire);
         this.setState({questionnaire, backendError: ''})
       }
     } catch(e) {
@@ -55,9 +71,9 @@ export default class SubmissionPage extends React.Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    // console.log('in handleSubmit');
+    console.log('in handleSubmit', this.state.uploadHash);
     try {
-      await web3Util.createSubmission(this.props.hackId, this.state.uploadHash);
+      web3Util.createSubmission(this.props.id, this.state.uploadHash);
     } catch (e) {
       this.setState({backendError: e.message || e});
     }
@@ -73,6 +89,16 @@ export default class SubmissionPage extends React.Component {
   }
 
   render() {
+    if (this.state.backendError !== '') {
+      return <Alert bsStyle="danger">{this.state.backendError}</Alert>
+    } else if (this.state.alreadySubmitted) {
+      return (
+        <div class="alert alert-success" role="alert">
+          Submission has already been made for team: {this.state.teamName}
+        </div>
+      )
+    }
+
     const rows = [];
     Object.keys(this.state.questionnaire || {}).forEach((q,i) => {
       const id = this.canonicalizeQuestion(q);
@@ -86,20 +112,27 @@ export default class SubmissionPage extends React.Component {
     });
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        {rows}
-        {
-          this.state.backendError !== '' &&
-          <Alert bsStyle="danger">{this.state.backendError}</Alert>
-        }
-        <button class="btn btn-primary" onClick={this.generateContentHash}>Generate upload hash</button>
-        {this.state.uploadHash &&
-          <div>
-            <label>Upload Hash: {this.state.uploadHash}</label>
-            <button type="submit" class="btn btn-success">Submit</button>
-          </div>
-        }
-      </form>
+      <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{this.state.teamName}</h5>
+        <form onSubmit={this.handleSubmit}>
+          {rows}
+          <button class="btn btn-primary" onClick={this.generateContentHash}>Generate upload hash</button>
+          {this.state.uploadHash &&
+            <div>
+              <input type="text"
+                class="form-control"
+                aria-label="Sizing example input"
+                aria-describedby="uploadHelp"
+                disabled
+                value={this.state.uploadHash} />
+              <small id="uploadHelp" class="form-text text-muted">The IPFS hash of the submission</small>
+              <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+          }
+        </form>
+      </div>
+      </div>
     )
   }
 }

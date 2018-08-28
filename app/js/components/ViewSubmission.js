@@ -33,7 +33,7 @@ export default class ViewSubmission extends React.Component {
     Object.keys(content).forEach((q,i) => {
       rows.push(
         <div class="card-text" key={i}>
-          <h4>{q}</h4>
+          <h5>{q}</h5>
           <p>{content[q]}</p>
         </div>
       );
@@ -45,9 +45,10 @@ export default class ViewSubmission extends React.Component {
           this.state.backendError !== '' &&
           <Alert bsStyle="danger">{this.state.backendError}</Alert>
         }
-        <h1 class="card-title">{this.state.name}</h1>
+        <h4 class="card-title">{this.state.name}</h4>
         <div class="card-body">
           {rows}
+          <button type="button" class="btn btn-info">Upvote</button>
         </div>
       </div>
     )
