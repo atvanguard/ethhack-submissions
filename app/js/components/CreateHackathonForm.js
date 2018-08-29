@@ -1,6 +1,6 @@
 import React from 'react'
-// const Datetime = require('react-datetime');
-import { Alert, Form, FormGroup, FormControl, HelpBlock, Button } from 'react-bootstrap';
+import DateTimePicker from 'react-datetime-picker';
+import { Alert, Form, FormGroup, FormControl, Button } from 'react-bootstrap';
 
 import EmbarkJS from 'Embark/EmbarkJS';
 import web3Util from '../Web3Util';
@@ -15,9 +15,10 @@ export default class CreateHackathonForm extends React.Component {
       startsAt: '',
       endsAt: '',
       fileToUpload: null,
-      backendError: ''
+      backendError: '',
+      startsAt: new Date(),
+      endsAt: new Date(),
     }
-
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -25,11 +26,18 @@ export default class CreateHackathonForm extends React.Component {
     this.setState({[key]: event.target.value});
   }
 
+  handleCalChange(key, date) {
+    console.log(key, date)
+    this.setState({[key]: date})
+  }
+
   async handleSubmit(event) {
     event.preventDefault();
     console.log(this.state);
     try {
-      await web3Util.createHackathon(this.state.hackathonName, this.state.fileHash, this.state.prizes, this.state.startsAt, this.state.endsAt);
+      const startsAt = Date.parse(this.state.startsAt) / 1000;
+      const endsAt = Date.parse(this.state.endsAt) / 1000;
+      await web3Util.createHackathon(this.state.hackathonName, this.state.fileHash, this.state.prizes, startsAt, endsAt);
     } catch (err) {
       this.setState({backendError: err.message || err});
     }
@@ -83,28 +91,20 @@ export default class CreateHackathonForm extends React.Component {
 
           <div class="form-row">
             <div class="form-group col">
-                <label for="prizes">Starts at</label>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text" id="startsAt">Epoch seconds</span>
-                    </div>
-                    <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="startsAt"
-                      placeholder="1535371574" id="startsAt"
-                      value={this.state.startsAt}
-                      onChange={(e) => this.handleChange(e, 'startsAt')} />
-                  </div>
+              <label for="startsAt">Starts at</label>
+              <div style={{"height": "35px"}}>
+                <DateTimePicker
+                  onChange={(date) => this.handleCalChange('startsAt', date)}
+                  value={this.state.startsAt} />
+              </div>
             </div>            
             <div class="form-group col">
-              <label for="prizes">Ends at</label>
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="endsAt">Epoch seconds</span>
-                  </div>
-                  <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="endsAt"
-                    placeholder="1535371574" id="endsAt"
-                    value={this.state.endsAt}
-                    onChange={(e) => this.handleChange(e, 'endsAt')} />
-                </div>
+              <label for="endsAt">Ends at</label>
+              <div style={{"height": "35px"}}>
+                <DateTimePicker
+                  onChange={(date) => this.handleCalChange('endsAt', date)}
+                  value={this.state.endsAt} />
+              </div>
             </div>
           </div>
 
