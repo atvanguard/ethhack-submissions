@@ -1,14 +1,17 @@
 {
   "name": "ethhack-submissions",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "",
   "scripts": {
+    "start": "embark run",
     "test": "embark test"
   },
   "author": "",
   "license": "ISC",
   "homepage": "",
   "devDependencies": {
+    "embark": "^3.1.10",
+    "embark-solc": "^0.2.2",
     "react": "^16.4.2",
     "react-bootstrap": "^0.32.3",
     "react-dom": "^16.4.2",
@@ -16,8 +19,6 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
-    "embark-solc": "^0.2.2",
-    "moment": "^2.22.2",
-    "react-datetime": "^2.15.0"
+    "moment": "^2.22.2"
   }
 }
