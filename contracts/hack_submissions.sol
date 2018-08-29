@@ -3,6 +3,11 @@ pragma solidity ^0.4.24;
 contract HackSubmissions {
   uint256 public hackathonCounter;
 
+  struct Comment {
+    address teamId;
+    string content;
+  }
+
   struct Team {
     // ETH address of the team that also acts as the unique id
     address id;
@@ -11,13 +16,16 @@ contract HackSubmissions {
     string name;
     // IPFS hash of the submission
     string content;
+    address[] votes;
+    // Unimplemented feature:
+// /tmp/solidity-20180725-35430-5ohcik/solidity_0.4.24/libsolidity/codegen/ArrayUtils.cpp(215): Throw in function auto dev::solidity::ArrayUtils::copyArrayToStorage(const dev::solidity::ArrayType &, const dev::solidity::ArrayType &)::(anonymous class)::operator()(dev::solidity::CompilerContext &) const
+// Dynamic exception type: boost::exception_detail::clone_impl<dev::solidity::UnimplementedFeatureError>
+// std::exception::what: Copying of type struct HackSubmissions.Comment memory[] memory to storage not yet supported.
+// [dev::tag_comment*] = Copying of type struct HackSubmissions.Comment memory[] memory to storage not yet supported.
+// Comment[] comments;
+    string[] comments;
+    mapping(uint => address) commentWriter;
     // @todo add ETH addresses of the individual team members
-  }
-
-  struct Submission {
-    bytes32 id;
-    string content;
-    Team team;
   }
 
   struct Hackathon {
@@ -32,7 +40,6 @@ contract HackSubmissions {
     // whitelisted teams
     address[] teamLeads;
     mapping(address => Team) teams;
-    // Submission[] submissions; 
   }
 
   // id to hackathon struct
@@ -90,7 +97,7 @@ contract HackSubmissions {
     address id = msg.sender;
     bytes32 hackId = bytes32(_hackId);
     require(hackathons[hackId].teams[id].id == address(0));
-    Team memory team = Team(id, hackId, name, "");
+    Team memory team = Team(id, hackId, name, "", new address[](0), new string[](0));
     hackathons[hackId].teamLeads.push(id);
     hackathons[hackId].teams[id] = team;
   }
@@ -138,13 +145,58 @@ contract HackSubmissions {
   function getTeam(uint256 _hackId, address teamId)
       public view
       validHackathon(bytes32(_hackId))
-      returns (string name, string content) {
+      returns (string name, string content, uint256 numVotes, uint numComments) {
     bytes32 hackId = bytes32(_hackId);
-    require(hackathons[hackId].teams[teamId].id != address(0), 'Team not registered');
+    Team storage team = hackathons[hackId].teams[teamId];
+    require(team.id != address(0), 'Team not registered');
     // Team storage team = hackathons[hackId].teams[teamId].name;
-    name = hackathons[hackId].teams[teamId].name;
-    content = hackathons[hackId].teams[teamId].content;
+    name = team.name;
+    content = team.content;
+    numVotes = team.votes.length;
+    numComments = team.comments.length;
+  }
+
+  function getComment(uint256 _hackId, address teamId, uint index)
+      public view
+      verifyTeam(bytes32(_hackId), teamId)
+      returns (string content, address writer) {
+    bytes32 hackId = bytes32(_hackId);
+    Team storage team = hackathons[hackId].teams[teamId];
+    require(index >= 0 && index < team.comments.length);
+    content = team.comments[index];
+    writer = team.commentWriter[index];
   } 
+
+  function comment(uint256 _hackId, address teamId, string content)
+    public
+    verifyTeam(bytes32(_hackId), msg.sender) // only other teams are allowed to upvote
+    verifyTeam(bytes32(_hackId), teamId) // verify voting for registered team
+  {
+    Team storage team = hackathons[bytes32(_hackId)].teams[teamId];
+    team.comments.push(content);
+    team.commentWriter[team.comments.length - 1] = msg.sender;
+    // team.comments.length++;
+    // team.comments[team.comments.length - 1] = Comment(msg.sender, content);
+  }
+
+  function upvote(uint256 _hackId, address teamId)
+    public
+    verifyTeam(bytes32(_hackId), msg.sender) // only other teams are allowed to upvote
+    verifyTeam(bytes32(_hackId), teamId) // verify voting for registered team
+  {
+    Team storage team = hackathons[bytes32(_hackId)].teams[teamId];
+    require(!hasVoted(team, msg.sender), 'Already voted');
+    team.votes.push(msg.sender);
+  }
+
+  function hasVoted(Team storage team, address voter) internal view returns (bool) {
+    for(uint256 i = 0; i < team.votes.length; i++) {
+      if (team.votes[i] == voter) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   // function isHackathonOver(bytes32 id) internal view returns(bool isOver) {
   //   Hackathon storage hack = hackathons[id];

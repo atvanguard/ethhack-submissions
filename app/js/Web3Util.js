@@ -41,8 +41,27 @@ class Web3Util {
     console.log('createSubmissionTx', createSubmissionTx);
   }
 
-  toBytes32(c) {
-    return Buffer.from(c.toString(), 'utf8');
+  async comment(hackId, teamId, _content) {
+    const content = web3.utils.asciiToHex(_content);
+    const from = await this.getAccount();
+    const estimateGas = await HackSubmissions.methods.comment(hackId, teamId, content).estimateGas({from});
+    console.log('comment - estimateGas', estimateGas);
+    const commentTx = await HackSubmissions.methods.comment(hackId, teamId, content).send({
+      from,
+      gas: estimateGas + 500
+    });
+    console.log('commentTx', commentTx);
+  }
+
+  async upvote(hackId, teamId) {
+    const from = await this.getAccount();
+    const estimateGas = await HackSubmissions.methods.upvote(hackId, teamId).estimateGas({from});
+    console.log('upvote - estimateGas', estimateGas);
+    const upvoteTx = await HackSubmissions.methods.upvote(hackId, teamId).send({
+      from,
+      gas: estimateGas + 500
+    });
+    console.log('upvoteTx', upvoteTx);
   }
 
   // read function
@@ -54,6 +73,13 @@ class Web3Util {
     console.log('hackId, teamId', hackId, teamId)
     const team = await HackSubmissions.methods.getTeam(hackId, teamId).call();
     return team;
+  }
+
+  async getComment(hackId, teamId, index) {
+    console.log(hackId, teamId, index)
+    const comment = await HackSubmissions.methods.getComment(hackId, teamId, index).call();
+    console.log(comment);
+    return comment;
   }
 }
 
