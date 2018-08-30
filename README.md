@@ -2,6 +2,8 @@
 
 etthhack-submissions is a DApp for managing final project submissions during a hackathon. It aims to engage teams over the project submissions of the fellow hackathon participants.
 
+Checkout the [Demo video](https://youtu.be/O_JqE-dX_ZU).
+
 Typical workflow looks like
 - An organiser creates a new hackathon and mentions the following details
   - Transfers the moneybag of total prizes to the smart contract ([`CreateHackathon`](contracts/hack_submissions.sol) function is payable).
