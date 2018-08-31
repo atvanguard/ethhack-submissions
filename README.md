@@ -1,6 +1,6 @@
 # ethhack-submissions
 
-etthhack-submissions is a DApp for managing final project submissions during a hackathon. It aims to engage teams over the project submissions of the fellow hackathon participants.
+etthhack-submissions is a DApp for managing final project submissions during a hackathon. It aims to engage participating teams by exposing functionalities like upvoting and commenting on the projects of the fellow participants.
 
 Checkout the [Demo video](https://youtu.be/O_JqE-dX_ZU).
 
@@ -40,14 +40,13 @@ Typical workflow looks like
 - Comments on a particular project.
 
 ### Development
-```shell
-npm i
-npm start
-```
-If you'd like to keep your ganache and IPFS instance independent of `embark`
+Keep ganache and IPFS instance independent of `embark`
 ```shell
 ganache-cli --mnemonic "example exile argue silk regular smile grass bomb merge arm assist farm"
 ipfs daemon
+```
+```shell
+npm i
 npm start
 ```
 Then load the mnemonic in metamask.
